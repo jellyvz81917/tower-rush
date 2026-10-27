@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b111d">
+  <meta name="description" content="Поймай момент и построй свой небоскрёб. Аркада на точность с управлением одним нажатием.">
+  <title>Tower Rush — Построй небоскрёб</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%230b111d'/%3E%3Cpath d='M9 29h22v6H9zm3-9h19v6H12zm-3-9h19v6H9zm7-9h15v6H16z' fill='%235ee9c3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/main.js"></script>
+</head>
+<body>
+  <div id="boot" class="boot" role="status"><strong>TOWER RUSH</strong><span>…</span></div>
+  <div class="app-shell" inert>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Tower Rush — главное меню">
+        <span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>TOWER<span class="brand-light">RUSH</span><small>ПОСТРОЙ НЕБОСКРЁБ</small></span>
+      </a>
+      <div class="header-actions">
+        <span class="tiny-label desktop-only"><span class="live-dot"></span> ВЫШЕ С КАЖДОЙ ПОПЫТКОЙ</span>
+        <button id="sound-button" class="icon-button" aria-label="Выключить звук" aria-pressed="true" title="Звук">♪</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="intro">
+        <div class="eyebrow"><span>01</span> АРКАДА НА ТОЧНОСТЬ</div>
+        <h1>Поймай<br>свою<br><em>высоту.</em></h1>
+        <p class="intro-copy">Один момент. Один этаж.<br>Как высоко ты сможешь подняться?</p>
+        <div class="record-card"><span class="record-symbol" aria-hidden="true">↗</span><div><span class="small-label">ЛИЧНЫЙ РЕКОРД</span><strong id="side-record">0</strong></div><span class="record-unit">очков</span></div>
+        <div class="rules">
+          <div><span class="rule-number">01</span><p><strong>Останови блок</strong><small>Нажми, когда края совпадут.</small></p></div>
+          <div><span class="rule-number">02</span><p><strong>Сохрани ширину</strong><small>Всё лишнее останется внизу.</small></p></div>
+          <div><span class="rule-number">03</span><p><strong>Поймай серию</strong><small>Точные этажи дают больше очков.</small></p></div>
+        </div>
+        <div class="intro-bottom"><span class="crosshair">✦</span> ТВОЙ ГОРОД НАЧИНАЕТСЯ С ОДНОГО ЭТАЖА</div>
+      </aside>
+
+      <section class="stage" aria-label="Игра Tower Rush">
+        <canvas id="game-canvas" tabindex="-1" aria-label="Игровое поле. Нажмите, чтобы установить этаж. Пробел или Enter — установка, Escape — пауза."></canvas>
+        <div class="stage-vignette" aria-hidden="true"></div>
+        <div class="stage-heading"><span><i class="live-dot"></i> NIGHT DISTRICT</span><span>EST. 2026</span></div>
+        <div id="hud" class="hud" hidden>
+          <div class="score-box"><span class="small-label">ОЧКИ</span><strong id="score">0</strong></div>
+          <div class="floor-box"><span class="small-label">ЭТАЖ</span><strong id="floors">0<span> / ∞</span></strong></div>
+          <button id="pause-button" class="icon-button pause-button" aria-label="Пауза">Ⅱ</button>
+        </div>
+        <div id="combo" class="combo" hidden></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <div id="play-hint" class="play-hint" hidden><span class="tap-icon" aria-hidden="true">◎</span> НАЖМИ, ЧТОБЫ ПОСТАВИТЬ ЭТАЖ</div>
+
+        <div id="overlay" class="overlay">
+          <section id="menu-panel" class="panel menu-panel" aria-labelledby="menu-title">
+            <div class="panel-kicker"><span class="line"></span> ТВОЯ СЛЕДУЮЩАЯ ВЫСОТА</div>
+            <h2 id="menu-title">Начни с одного этажа.</h2>
+            <p>Поставь блок точно над предыдущим.<br>Каждое попадание — шаг к новому рекорду.</p>
+            <div class="menu-record">ЛИЧНЫЙ РЕКОРД <strong id="menu-record">0</strong></div>
+            <button id="start-button" class="primary-button">Строить <span aria-hidden="true">↗</span></button>
+            <button id="help-button" class="text-button">Как играть <span aria-hidden="true">?</span></button>
+          </section>
+
+          <section id="pause-panel" class="panel modal-panel" hidden aria-labelledby="pause-title">
+            <div class="panel-kicker">МОЖНО ВЫДОХНУТЬ</div>
+            <h2 id="pause-title">Высота подождёт.</h2>
+            <p id="pause-copy">Башня на месте. Продолжай, когда будешь готов.</p>
+            <button id="resume-button" class="primary-button">Продолжить <span aria-hidden="true">→</span></button>
+            <button id="restart-button" class="secondary-button">Начать заново</button>
+            <button id="pause-menu-button" class="text-button">В главное меню</button>
+          </section>
+
+          <section id="result-panel" class="panel modal-panel" hidden aria-labelledby="result-title">
+            <div id="result-kicker" class="panel-kicker">ХОРОШАЯ ПОПЫТКА</div>
+            <h2 id="result-title">Ещё на этаж выше?</h2>
+            <div class="result-score"><strong id="result-score">0</strong><span>очков</span></div>
+            <div class="result-stats">
+              <div><strong id="result-floors">0</strong><span>этажей</span></div>
+              <div><strong id="result-perfect">0</strong><span>точных</span></div>
+              <div><strong id="result-combo">0</strong><span>лучшая серия</span></div>
+            </div>
+            <p class="result-record">Личный рекорд <strong id="result-record">0</strong></p>
+            <button id="reward-button" class="secondary-button" hidden>Реклама → продолжить</button>
+            <p id="reward-copy" class="reward-copy" hidden>Одна дополнительная попытка после просмотра рекламы.</p>
+            <button id="retry-button" class="primary-button">Ещё раз <span aria-hidden="true">↗</span></button>
+            <button id="result-menu-button" class="text-button">В главное меню</button>
+          </section>
+
+          <section id="help-panel" class="panel modal-panel" hidden aria-labelledby="help-title">
+            <div class="panel-kicker">ЛОВИ МОМЕНТ</div>
+            <h2 id="help-title">Точность решает.</h2>
+            <ol class="help-list"><li>Нажми на игровое поле, чтобы остановить движущийся блок.</li><li>Выступающая часть отрежется. Полный промах завершит попытку.</li><li>Точное попадание сохраняет ширину. Серия точных этажей увеличивает бонус.</li></ol>
+            <p class="key-instruction"><kbd>Пробел</kbd> или <kbd>Enter</kbd> — поставить<br><kbd>Esc</kbd> — пауза</p>
+            <button id="help-back-button" class="primary-button">Понятно <span aria-hidden="true">✓</span></button>
+          </section>
+        </div>
+        <div id="ad-overlay" class="overlay ad-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="ad-text">
+          <section class="panel modal-panel">
+            <div class="panel-kicker">ПАУЗА ДЛЯ РЕКЛАМЫ</div>
+            <p id="ad-text">Ожидаем рекламу…</p>
+            <button id="ad-recover" class="secondary-button" hidden>Вернуться к игре</button>
+          </section>
+        </div>
+        <div class="stage-coordinates" aria-hidden="true"><span>+ 55.75 / 37.62</span><span>BUILD YOUR MOMENT</span></div>
+      </section>
+    </main>
+    <footer class="footer"><span>МАЛЕНЬКИЕ ШАГИ. БОЛЬШАЯ ВЫСОТА.</span><span><kbd>Пробел</kbd> поставить <span class="footer-divider">/</span> <kbd>Esc</kbd> пауза</span></footer>
+  </div>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <noscript><div class="notice">Для игры необходимо включить JavaScript в браузере.</div></noscript>
+</body>
+</html>
