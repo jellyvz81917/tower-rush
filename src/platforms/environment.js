@@ -1,1 +1,1 @@
-export const BUILD_PLATFORM = 'local';
+export const BUILD_PLATFORM = 'auto';

@@ -13,12 +13,13 @@ import { selectLanguage, translator, translateDocument } from './ui/i18n.js';
 
 export async function startApp({ platform = createPlatform(), browserLanguage = navigator.language } = {}) {
   const startedAt = performance.now();
+  document.documentElement.dataset.gameVersion = '0.2.1';
+  console.info(`[Tower Rush] platform selected: ${platform.kind || platform.status}`);
   await platform.init();
   const language = selectLanguage(platform.language, browserLanguage);
   const t = translator(language);
   translateDocument(document, language);
   document.documentElement.dataset.sdkStatus = platform.status;
-  document.documentElement.dataset.gameVersion = '0.2.0';
   const $ = id => document.getElementById(id);
   const canvas = $('game-canvas');
   const game = new Game();
@@ -263,6 +264,6 @@ export async function startApp({ platform = createPlatform(), browserLanguage = 
   requestAnimationFrame(frame);
   platform.ready();
   document.documentElement.dataset.sdkStatus = platform.status;
-  if (['unavailable', 'ready-error'].includes(platform.status)) notify('Функции платформы недоступны. Можно играть без рекламы.');
-  console.info(`Tower Rush ready: ${Math.round(performance.now() - startedAt)} ms; platform=${platform.status}; language=${language}`);
+  if (['unavailable', 'ready-error', 'vk-unavailable'].includes(platform.status)) notify('Функции платформы недоступны. Можно играть без рекламы.');
+  console.info(`Tower Rush ready: ${Math.round(performance.now() - startedAt)} ms; platform=${platform.status}; language=${language}; version=0.2.1`);
 }
